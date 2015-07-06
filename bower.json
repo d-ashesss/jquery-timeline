@@ -1,0 +1,19 @@
+{
+	"name": "jquery-timeline",
+	"description": "History timeline jQuery plugin",
+	"keywords": ["timeline", "timelinejs", "history", "jquery"],
+	"license": "MIT",
+	"authors": [
+		{ "name": "Sergey Mashentsev", "email": "d.ashesss@gmail.com" }
+	],
+	"version": "0.0.1",
+	"dependencies": {
+	},
+	"main": [
+		"dist/timeline.js",
+		"dist/timeline.css"
+	],
+	"ignore": [
+		"tsd.json"
+	]
+}
