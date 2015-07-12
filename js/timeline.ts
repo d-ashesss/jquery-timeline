@@ -46,24 +46,47 @@ module JQueryTimeline {
 				this.zoom = 200;
 			}
 
-			options.lines.forEach(this.addLine, this);
-			this.buildBackground();
+			options.lines.forEach(this._addLine, this);
+			this.render();
 		}
 
 		addLine(line: LineOptions): JQuery {
+			var $line = this._addLine(line);
+			this.render();
+			return $line;
+		}
+
+		private _addLine(line: LineOptions): JQuery {
 			var $line = $("<div>", { "class": "line " + line.color })
 				.data("line", line)
 				.appendTo(this.$content);
 			this.lines.push($line);
+			line.events = line.events || [];
 			line.events.forEach((event) => {
-				this.addEvent(event, $line);
+				this._addEvent(event, $line);
 			});
 			return $line;
 		}
 
+		addEvent(event: EventOptions): JQuery;
 		addEvent(event: EventOptions, $line: number): JQuery;
 		addEvent(event: EventOptions, $line: JQuery): JQuery;
-		addEvent(event, $line) {
+		addEvent(event, $line?) {
+			var $event = this._addEvent(event, $line);
+			this.render();
+			return $event;
+		}
+
+		private _addEvent(event: EventOptions): JQuery;
+		private _addEvent(event: EventOptions, $line: number): JQuery;
+		private _addEvent(event: EventOptions, $line: JQuery): JQuery;
+		private _addEvent(event, $line?) {
+			if (typeof $line === "undefined") {
+				if (this.lines.length === 0) {
+					this._addLine({ color: "gray" });
+				}
+				$line = this.lines.length - 1;
+			}
 			if (typeof $line === "number") {
 				$line = this.lines[$line];
 			}
@@ -99,7 +122,7 @@ module JQueryTimeline {
 			return year * this.zoom * Timeline.yearAtom;
 		}
 
-		private buildBackground() {
+		render() {
 			this.$background.empty();
 			var years = [];
 			this.events.forEach(($event) => {
@@ -131,6 +154,7 @@ module JQueryTimeline {
 						.append($("<div>", { "class": "label" }).text(format_year(year)));
 				}
 			}
+			this.$.scrollLeft(this.yearWidth(high_step));
 			this.alignEvents(min_year);
 		}
 

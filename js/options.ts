@@ -4,12 +4,12 @@ module JQueryTimeline {
 	export interface Options {
 		container?: JQuery
 		zoom?: number
-		lines: Array<LineOptions>
+		lines?: Array<LineOptions>
 	}
 
 	export interface LineOptions {
 		color: string
-		events: Array<EventOptions>
+		events?: Array<EventOptions>
 	}
 
 	export interface EventOptions {
