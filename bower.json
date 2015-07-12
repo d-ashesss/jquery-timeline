@@ -6,8 +6,9 @@
 	"authors": [
 		{ "name": "Sergey Mashentsev", "email": "d.ashesss@gmail.com" }
 	],
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"dependencies": {
+		"jquery": ">=1.4"
 	},
 	"main": [
 		"dist/timeline.js",

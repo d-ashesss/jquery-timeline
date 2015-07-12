@@ -1,0 +1,79 @@
+.jquery-timeline {
+  background-color: #F7F7F7;
+  color: #333;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+.jquery-timeline > .background {
+  height: 100%;
+  position: absolute;
+}
+.jquery-timeline > .background .period {
+  border-left: 1px dashed #CCCCCC;
+  vertical-align: top;
+  height: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+}
+.jquery-timeline > .background .period.solid {
+  border-left-style: solid;
+}
+.jquery-timeline > .background .period .label {
+  color: #666;
+  position: absolute;
+  bottom: 0;
+  line-height: 100%;
+  font-size: .7em;
+}
+.jquery-timeline > .content {
+  z-index: 1;
+  position: relative;
+  padding: 1em 0 .5em;
+  margin-bottom: 1em;
+  vertical-align: top;
+}
+.jquery-timeline > .content .line {
+  height: 3em;
+  margin-bottom: .5em;
+}
+.jquery-timeline > .content .line .event {
+  display: inline-block;
+  position: absolute;
+  z-index: 1;
+}
+.jquery-timeline > .content .line .event > * {
+  vertical-align: top;
+}
+.jquery-timeline > .content .line .event:hover.range .marker,
+.jquery-timeline > .content .line .event:hover.single .marker {
+  box-shadow: 0 0 1px #000;
+  opacity: .8;
+}
+.jquery-timeline > .content .line .event.range .marker {
+  height: 1.5em;
+}
+.jquery-timeline > .content .line .event.single {
+  height: 3em;
+  margin-left: -0.375em;
+}
+.jquery-timeline > .content .line .event.single .marker {
+  background-color: #000;
+  display: inline-block;
+  width: .75em;
+  height: .75em;
+  border-radius: 100%;
+  margin: .325em 0;
+}
+.jquery-timeline > .content .line .event .marker {
+  box-sizing: border-box;
+  opacity: .6;
+}
+.jquery-timeline > .content .line .event .label {
+  display: inline-block;
+  padding: 0 5px;
+  line-height: 2.02em;
+  font-size: .75em;
+}
+/*# sourceMappingURL=timeline.css.map */
