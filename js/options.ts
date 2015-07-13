@@ -8,7 +8,7 @@ module JQueryTimeline {
 	}
 
 	export interface LineOptions {
-		color: string
+		color?: string
 		events?: Array<EventOptions>
 	}
 

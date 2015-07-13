@@ -14,8 +14,7 @@ module JQueryTimeline {
 		private $background: JQuery;
 		private $content: JQuery;
 
-		private lines: Array<JQuery> = [];
-		private events: Array<Event> = [];
+		private lines: Array<Line> = [];
 
 		private zoom: number;
 
@@ -50,44 +49,32 @@ module JQueryTimeline {
 			this.render();
 		}
 
-		addLine(line: LineOptions): JQuery {
-			var $line = this._addLine(line);
+		addLine(line_options?: LineOptions): Line {
+			var line = this._addLine(line_options);
 			this.render();
-			return $line;
+			return line;
 		}
 
-		private _addLine(line_options: LineOptions): JQuery {
-			var $line = $("<div>", { "class": "line " + line_options.color })
-				.data("line", line_options)
-				.appendTo(this.$content);
-			this.lines.push($line);
-			line_options.events = line_options.events || [];
-			line_options.events.forEach((event_options) => {
-				event_options.color = event_options.color || line_options.color;
-				var event = new Event(event_options);
-				$line.append(event.$);
-				this.events.push(event);
-			});
-			return $line;
+		private _addLine(line_options?: LineOptions): Line {
+			var line = new Line(line_options);
+			this.$content.append(line.$);
+			this.lines.push(line);
+			return line;
 		}
 
-		addEvent(event_options: EventOptions, line_index?: number) {
+		addEvent(event_options: EventOptions, line_index?: number): Event {
 			if (typeof line_index === "undefined") {
 				if (this.lines.length === 0) {
-					this._addLine({ color: "gray" });
+					this._addLine();
 				}
 				line_index = this.lines.length - 1;
 			}
 			if (typeof this.lines[line_index] === "undefined") {
 				return;
 			}
-			var $line = this.lines[line_index];
-			var line_options = <LineOptions>$line.data("line");
-			event_options.color = event_options.color || line_options.color;
-			var event = new Event(event_options);
-			$line.append(event.$);
-			this.events.push(event);
+			var event = this.lines[line_index].addEvent(event_options);
 			this.render();
+			return event;
 		}
 
 		getYearWidth(): number {
@@ -101,8 +88,8 @@ module JQueryTimeline {
 		render() {
 			this.$background.empty();
 			var years = [];
-			this.events.forEach((event) => {
-				years.push(event.getStartYear(), event.getEndYear());
+			this.lines.forEach((line) => {
+				years = years.concat(line.getYears());
 			});
 			if (years.length === 0) {
 				return;
@@ -127,11 +114,11 @@ module JQueryTimeline {
 				}
 			}
 			this.$.scrollLeft(this.yearWidth(high_step));
-			this.renderEvents(min_year);
+			this.renderLines(min_year);
 		}
 
-		private renderEvents(min_year: number) {
-			this.events.forEach((event) => {
+		private renderLines(min_year: number) {
+			this.lines.forEach((event) => {
 				event.render(min_year, this.getYearWidth());
 			});
 		}
