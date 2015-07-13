@@ -6,8 +6,7 @@ module JQueryTimeline {
 	export class Timeline {
 		static yearAtom: number = 0.24;
 		static defaultOptions: Options = {
-			zoom: 100,
-			lines: []
+			zoom: 100
 		};
 
 		$: JQuery;
@@ -45,6 +44,12 @@ module JQueryTimeline {
 				this.zoom = 200;
 			}
 
+			options.lines = options.lines || [];
+			if (options.events) {
+				options.lines.push({
+					events: options.events
+				});
+			}
 			options.lines.forEach(this._addLine, this);
 			this.render();
 		}

@@ -5,6 +5,7 @@ module JQueryTimeline {
 		container?: JQuery
 		zoom?: number
 		lines?: Array<LineOptions>
+		events?: Array<EventOptions>
 	}
 
 	export interface LineOptions {
