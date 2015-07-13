@@ -32,10 +32,10 @@ module JQueryTimeline {
 
 			this.$ = options.container
 				.addClass("jquery-timeline")
-				.bind("mousewheel", scroll)
 				.data("timeline", this);
 			this.$background = $("<div>", { "class": "background" }).appendTo(this.$);
 			this.$content = $("<div>", { "class": "content" }).appendTo(this.$);
+			this.initScroll();
 
 			this.zoom = options.zoom;
 			if (this.zoom <= 0) {
@@ -52,6 +52,34 @@ module JQueryTimeline {
 			}
 			options.lines.forEach(this._addLine, this);
 			this.render();
+		}
+
+		private initScroll() {
+			this.$.bind("mousewheel", (event: JQueryEventObject) => {
+				event.preventDefault();
+				this.scroll((<WheelEvent>event.originalEvent).deltaY);
+			});
+
+			this.$.data("scroll", false);
+			this.$.mousedown((event: JQueryEventObject) => {
+				var timeout = setTimeout(() => {
+					this.$.data("scroll", event.pageX)
+						.addClass("dragging");
+				}, 50);
+				this.$.data("scroll-timeout", timeout);
+			});
+			$(document).mousemove((event: JQueryEventObject) => {
+				var prev_scroll = this.$.data("scroll");
+				if (prev_scroll !== false) {
+					this.scroll(prev_scroll - event.pageX);
+					this.$.data("scroll", event.pageX);
+				}
+			});
+			$(document).mouseup(() => {
+				this.$.data("scroll", false)
+					.removeClass("dragging");
+				clearTimeout(this.$.data("scroll-timeout"));
+			});
 		}
 
 		addLine(line_options?: LineOptions): Line {
@@ -127,13 +155,11 @@ module JQueryTimeline {
 				event.render(min_year, this.getYearWidth());
 			});
 		}
-	}
 
-	function scroll(event: JQueryEventObject) {
-		event.preventDefault();
-		var wheel_event = <WheelEvent>event.originalEvent;
-		var scroll_before = $(this).scrollLeft();
-		$(this).scrollLeft(scroll_before + wheel_event.deltaY);
+		private scroll(delta: number) {
+			var scroll_before = this.$.scrollLeft();
+			this.$.scrollLeft(scroll_before + delta);
+		}
 	}
 
 	function round_year(year: number, step = 10, ceil = false): number {
