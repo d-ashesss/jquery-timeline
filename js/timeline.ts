@@ -59,6 +59,11 @@ module JQueryTimeline {
 				event.preventDefault();
 				this.scroll((<WheelEvent>event.originalEvent).deltaY);
 			});
+			this.$.bind("DOMMouseScroll", (event: any) => {
+				var _event = <MouseEvent>event;
+				_event.preventDefault();
+				this.scroll(_event.detail * 20);
+			});
 
 			this.$.data("scroll", false);
 			this.$.mousedown((event: JQueryEventObject) => {
