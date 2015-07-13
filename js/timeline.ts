@@ -15,7 +15,7 @@ module JQueryTimeline {
 		private $content: JQuery;
 
 		private lines: Array<JQuery> = [];
-		private events: Array<JQuery> = [];
+		private events: Array<Event> = [];
 
 		private zoom: number;
 
@@ -56,81 +56,53 @@ module JQueryTimeline {
 			return $line;
 		}
 
-		private _addLine(line: LineOptions): JQuery {
-			var $line = $("<div>", { "class": "line " + line.color })
-				.data("line", line)
+		private _addLine(line_options: LineOptions): JQuery {
+			var $line = $("<div>", { "class": "line " + line_options.color })
+				.data("line", line_options)
 				.appendTo(this.$content);
 			this.lines.push($line);
-			line.events = line.events || [];
-			line.events.forEach((event) => {
-				this._addEvent(event, $line);
+			line_options.events = line_options.events || [];
+			line_options.events.forEach((event_options) => {
+				event_options.color = event_options.color || line_options.color;
+				var event = new Event(event_options);
+				$line.append(event.$);
+				this.events.push(event);
 			});
 			return $line;
 		}
 
-		addEvent(event: EventOptions): JQuery;
-		addEvent(event: EventOptions, $line: number): JQuery;
-		addEvent(event: EventOptions, $line: JQuery): JQuery;
-		addEvent(event, $line?) {
-			var $event = this._addEvent(event, $line);
-			this.render();
-			return $event;
-		}
-
-		private _addEvent(event: EventOptions): JQuery;
-		private _addEvent(event: EventOptions, $line: number): JQuery;
-		private _addEvent(event: EventOptions, $line: JQuery): JQuery;
-		private _addEvent(event, $line?) {
-			if (typeof $line === "undefined") {
+		addEvent(event_options: EventOptions, line_index?: number) {
+			if (typeof line_index === "undefined") {
 				if (this.lines.length === 0) {
 					this._addLine({ color: "gray" });
 				}
-				$line = this.lines.length - 1;
+				line_index = this.lines.length - 1;
 			}
-			if (typeof $line === "number") {
-				$line = this.lines[$line];
+			if (typeof this.lines[line_index] === "undefined") {
+				return;
 			}
-			var line = <LineOptions>$line.data("line");
-			var $event = $("<div>", { "class": "event" })
-				.data("event", event)
-				.append($("<div>", { "class": "marker" }))
-				.append($("<div>", { "class": "label" }).text(event.label))
-				.appendTo($line);
-			this.events.push($event);
+			var $line = this.lines[line_index];
+			var line_options = <LineOptions>$line.data("line");
+			event_options.color = event_options.color || line_options.color;
+			var event = new Event(event_options);
+			$line.append(event.$);
+			this.events.push(event);
+			this.render();
+		}
 
-			if (event.length) {
-				event.end = event.start + event.length;
-			}
-			if (event.end) {
-				event.length = event.end - event.start;
-				$event.addClass("range");
-				$event.find(".marker")
-					.css("background-color", line.color)
-					.width(this.yearWidth(event.length));
-			} else {
-				$event.addClass("single");
-			}
-
-			if (event.color) {
-				$event.find(".marker").css("background-color", event.color);
-			}
-
-			return $event;
+		getYearWidth(): number {
+			return this.zoom * Timeline.yearAtom;
 		}
 
 		yearWidth(year: number): number {
-			return year * this.zoom * Timeline.yearAtom;
+			return year * this.getYearWidth();
 		}
 
 		render() {
 			this.$background.empty();
 			var years = [];
-			this.events.forEach(($event) => {
-				var event = <EventOptions>$event.data("event");
-				years.push(event.start);
-				if (event.end) {
-					years.push(event.end);
-				}
+			this.events.forEach((event) => {
+				years.push(event.getStartYear(), event.getEndYear());
 			});
 			if (years.length === 0) {
 				return;
@@ -155,14 +127,12 @@ module JQueryTimeline {
 				}
 			}
 			this.$.scrollLeft(this.yearWidth(high_step));
-			this.alignEvents(min_year);
+			this.renderEvents(min_year);
 		}
 
-		private alignEvents(min_year: number) {
-			this.events.forEach(($event) => {
-				var event = <EventOptions>$event.data("event");
-				var width: number = this.yearWidth(event.start - min_year);
-				$event.css("left", width);
+		private renderEvents(min_year: number) {
+			this.events.forEach((event) => {
+				event.render(min_year, this.getYearWidth());
 			});
 		}
 	}

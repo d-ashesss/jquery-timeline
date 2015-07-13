@@ -1,6 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="timeline.ts" />
 /// <reference path="options.ts" />
+/// <reference path="event.ts" />
 
 "use strict";
 
