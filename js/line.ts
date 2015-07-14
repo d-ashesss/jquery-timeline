@@ -11,7 +11,7 @@ module JQueryTimeline {
 		constructor(options: LineOptions = {}) {
 			this.$ = $("<div>", {
 				"class": "line",
-				"data": { "line": this }
+				"data": { "line": this },
 			});
 			if (options.color) {
 				this.color = options.color;
@@ -38,9 +38,9 @@ module JQueryTimeline {
 			return years;
 		}
 
-		render(min_year: number, year_length: number) {
+		render(options: RenderOptions) {
 			this.events.forEach((event) => {
-				event.render(min_year, year_length);
+				event.render(options);
 			});
 		}
 	}

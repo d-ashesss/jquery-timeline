@@ -4,9 +4,12 @@ module JQueryTimeline {
 	export var $: JQueryStatic;
 
 	export class Timeline {
-		static yearAtom: number = 0.24;
+		static zoomBase: number = 1000;
+		static yearScale: number = 0.24;
 		static defaultOptions: Options = {
-			zoom: 100
+			zoom: 100,
+			scale: 1,
+			minorSections: 5,
 		};
 
 		$: JQuery;
@@ -16,6 +19,8 @@ module JQueryTimeline {
 		private lines: Array<Line> = [];
 
 		private zoom: number;
+		private yearScale: number;
+		private minorSections: number;
 
 		constructor(options: Options) {
 			if (!(this instanceof Timeline)) {
@@ -37,12 +42,15 @@ module JQueryTimeline {
 			this.$content = $("<div>", { "class": "content" }).appendTo(this.$);
 			this.initScroll();
 
+			var max_zoom = Timeline.zoomBase / options.minorSections;
 			this.zoom = options.zoom;
 			if (this.zoom <= 0) {
 				this.zoom = 1;
-			} else if (this.zoom > 200) {
-				this.zoom = 200;
+			} else if (this.zoom > max_zoom) {
+				this.zoom = max_zoom;
 			}
+			this.yearScale = Timeline.yearScale * options.scale;
+			this.minorSections = options.minorSections;
 
 			options.lines = options.lines || [];
 			if (options.events) {
@@ -115,49 +123,61 @@ module JQueryTimeline {
 			return event;
 		}
 
-		getYearWidth(): number {
-			return this.zoom * Timeline.yearAtom;
-		}
-
-		yearWidth(year: number): number {
-			return year * this.getYearWidth();
-		}
-
 		render() {
 			this.$background.empty();
+			var options = this.getRenderOptions();
+			if (options.years.length === 0) {
+				return;
+			}
+			this.renderBackground(options);
+			this.renderLines(options);
+		}
+
+		private getRenderOptions(): RenderOptions {
 			var years = [];
 			this.lines.forEach((line) => {
 				years = years.concat(line.getYears());
 			});
-			if (years.length === 0) {
-				return;
-			}
-			var inner_sections = 5;
-			var high_step = round_year(1000 / this.zoom, inner_sections);
-			var low_step = high_step / inner_sections;
-			var min_year = round_year(Math.min.apply(null, years), high_step, false);
-			min_year -= high_step;
-			var max_year = round_year(Math.max.apply(null, years), high_step, true);
-			max_year += low_step * (inner_sections - 1);
+
+			var major_step = round_year(Timeline.zoomBase / this.zoom, this.minorSections);
+			var minor_step = major_step / this.minorSections;
+
+			var min_year = round_year(Math.min.apply(null, years), major_step, false);
+			min_year -= major_step;
+			var max_year = round_year(Math.max.apply(null, years), major_step, true);
+			max_year += minor_step * (this.minorSections - 1);
+
+			return {
+				years: years,
+				year_width: this.zoom * this.yearScale,
+				major_step: major_step,
+				minor_step: minor_step,
+				min_year: min_year,
+				max_year: max_year,
+			};
+		}
+
+		private renderBackground(options: RenderOptions) {
 			var year: number;
-			for (year = min_year; year <= max_year; year += low_step) {
-				var width = Math.round(this.yearWidth(low_step));
+			for (year = options.min_year; year <= options.max_year; year += options.minor_step) {
+				var width = Math.round(options.minor_step * options.year_width);
 				var $period = $("<div>", { "class": "period" })
 					.width(width)
 					.appendTo(this.$background);
-				if (year % high_step === 0) {
-					$period
-						.addClass("solid")
-						.append($("<div>", { "class": "label" }).text(format_year(year)));
+				if (year % options.major_step === 0) {
+					$period.addClass("solid");
+					$("<div>", {
+						"class": "label",
+						"text": format_year(year),
+					}).appendTo($period);
 				}
 			}
-			this.$.scrollLeft(this.yearWidth(high_step));
-			this.renderLines(min_year);
+			this.$.scrollLeft(options.major_step * options.year_width);
 		}
 
-		private renderLines(min_year: number) {
-			this.lines.forEach((event) => {
-				event.render(min_year, this.getYearWidth());
+		private renderLines(options: RenderOptions) {
+			this.lines.forEach((line) => {
+				line.render(options);
 			});
 		}
 
@@ -182,16 +202,16 @@ module JQueryTimeline {
 		if (abs_year >= 1e9) {
 			abs_year /= 1e8;
 			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + 'B';
+			label = abs_year + "B";
 		} else if (abs_year >= 1e6) {
 			abs_year /= 1e5;
 			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + 'M';
+			label = abs_year + "M";
 		} else if (abs_year >= 1e4) {
 			abs_year /= 1e5;
 			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + 'K';
+			label = abs_year + "K";
 		}
-		return label + (year < 0 ? ' BC' : ' AD');
+		return label + (year < 0 ? " BC" : " AD");
 	}
 }

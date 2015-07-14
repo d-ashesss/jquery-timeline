@@ -14,17 +14,17 @@ module JQueryTimeline {
 		constructor(options: EventOptions) {
 			this.$ = $("<div>", {
 				"class": "event",
-				"data": { "event": this }
+				"data": { "event": this },
 			});
 			this.$marker = $("<div>", {
 				"class": "marker",
 				"css": {
-					"background-color": options.color || Event.defaultColor
-				}
+					"background-color": options.color || Event.defaultColor,
+				},
 			}).appendTo(this.$);
 			this.$label = $("<div>", {
 				"class": "label",
-				text: options.label
+				text: options.label,
 			}).appendTo(this.$);
 
 			this.year = options.start;
@@ -47,9 +47,9 @@ module JQueryTimeline {
 			return this.year + (this.length || 0);
 		}
 
-		render(min_year: number, year_length: number) {
-			this.$.css("left", (this.year - min_year) * year_length);
-			this.$marker.width(this.length * year_length);
+		render(options: RenderOptions) {
+			this.$.css("left", (this.year - options.min_year) * options.year_width);
+			this.$marker.width(this.length * options.year_width);
 		}
 	}
 }

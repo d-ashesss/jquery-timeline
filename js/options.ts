@@ -4,6 +4,8 @@ module JQueryTimeline {
 	export interface Options {
 		container?: JQuery
 		zoom?: number
+		scale?: number
+		minorSections?: number
 		lines?: Array<LineOptions>
 		events?: Array<EventOptions>
 	}
@@ -19,5 +21,14 @@ module JQueryTimeline {
 		end?: number
 		length?: number
 		color?: string
+	}
+
+	export interface RenderOptions {
+		years: Array<number>
+		year_width: number
+		major_step: number
+		minor_step: number
+		min_year: number
+		max_year: number
 	}
 }
