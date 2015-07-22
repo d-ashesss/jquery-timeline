@@ -25,8 +25,16 @@ module JQueryTimeline {
 		addEvent(event_options: EventOptions): Event {
 			event_options.color = event_options.color || this.color;
 			var event = new Event(event_options);
-			this.$.append(event.$);
-			this.events.push(event);
+			var added = this.events.some((e: Event, i: number) => {
+				if (e.getStartYear() <= event.getStartYear()) {
+					return false;
+				}
+				this.events.splice(i, 0, event);
+				return true;
+			});
+			if (!added) {
+				this.events.push(event);
+			}
 			return event;
 		}
 
@@ -39,7 +47,20 @@ module JQueryTimeline {
 		}
 
 		render(options: RenderOptions) {
+			this.$.find(".row").detach();
 			this.events.forEach((event) => {
+				var added = this.$.find(".row").toArray().some((row) => {
+					var left = (event.getStartYear() - options.min_year) * options.year_width;
+					var $prev_event = $(row).find(".event").last();
+					var prev_event_right = $prev_event.width() + parseFloat($prev_event.css("left"));
+					if ((prev_event_right - 10) < left) {
+						$(row).append(event.$);
+						return true;
+					}
+				});
+				if (!added) {
+					$("<div>", { "class": "row" }).append(event.$).appendTo(this.$);
+				}
 				event.render(options);
 			});
 		}
