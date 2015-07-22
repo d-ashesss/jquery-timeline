@@ -12,6 +12,88 @@ module JQueryTimeline {
 			minorSections: 5,
 		};
 
+		static $tooltip: JQuery;
+
+		static tooltip(options: TooltipOptions): JQuery {
+			var $tooltip = Timeline.$tooltip;
+			if (!$tooltip) {
+				$tooltip = Timeline.$tooltip = $("<div>", {
+					"class": "jquery-timeline-tooltip"
+				}).appendTo("body");
+				$("body").click((e) => {
+					if ($(e.target).is(".event")
+							//|| $(e.target).parent().is(".event")
+						|| $(e.target).is(".jquery-timeline-tooltip")
+						|| $(e.target).parents(".event, .jquery-timeline-tooltip").length > 0) {
+						return;
+					}
+					this.tooltip({ hide: true, fixed: true });
+				});
+			}
+			if (options.hide) {
+				if ($tooltip.is(".fixed") && !options.fixed) {
+					return;
+				}
+				return $tooltip.removeClass("fixed").hide();
+			}
+			if (!$tooltip.is(".fixed") || options.fixed) {
+				if (typeof options.content !== "undefined") {
+					$tooltip.html(options.content);
+				}
+				if (typeof options.x !== "undefined") {
+					var width = $tooltip.width();
+					$tooltip.css("left", options.x - (width / 2));
+				}
+				if (typeof options.y !== "undefined") {
+					$tooltip.css("top", options.y);
+				}
+				if (options.fixed) {
+					$tooltip.addClass("fixed");
+				}
+			}
+			return $tooltip.show();
+		}
+
+		static roundYear(year: number, step = 10, ceil = false): number {
+			var high = year / step;
+			high = ceil ? Math.ceil(high) : Math.floor(high);
+			if (high === 0) {
+				return 0; // avoid -0
+			}
+			return high * step;
+		}
+
+		static simplifyYear(year: number): string {
+			var abs_year = Math.abs(year);
+			var year_str = "" + abs_year;
+			if (abs_year >= 1e9) {
+				abs_year /= 1e8;
+				abs_year = Math.round(abs_year) / 10;
+				year_str = abs_year + "B";
+			} else if (abs_year >= 1e6) {
+				abs_year /= 1e5;
+				abs_year = Math.round(abs_year) / 10;
+				year_str = abs_year + "M";
+			} else if (abs_year >= 1e4) {
+				abs_year /= 1e5;
+				abs_year = Math.round(abs_year) / 10;
+				year_str = abs_year + "K";
+			}
+			return year_str;
+		}
+
+		static formatYear(year: number): string {
+			var label = this.simplifyYear(year);
+			return label + (year < 0 ? " BC" : " AD");
+		}
+
+		static formatRange(start: number, end: number): string {
+			if ((start < 0 && end < 0) || (start > 0 && end > 0)) {
+				return this.simplifyYear(start) + " - " + this.formatYear(end);
+			}
+			return this.formatYear(start) + " - " + this.formatYear(end);
+		}
+
 		$: JQuery;
 		private $background: JQuery;
 		private $content: JQuery;
@@ -139,12 +221,12 @@ module JQueryTimeline {
 				years = years.concat(line.getYears());
 			});
 
-			var major_step = round_year(Timeline.zoomBase / this.zoom, this.minorSections);
+			var major_step = Timeline.roundYear(Timeline.zoomBase / this.zoom, this.minorSections);
 			var minor_step = major_step / this.minorSections;
 
-			var min_year = round_year(Math.min.apply(null, years), major_step, false);
+			var min_year = Timeline.roundYear(Math.min.apply(null, years), major_step, false);
 			min_year -= major_step;
-			var max_year = round_year(Math.max.apply(null, years), major_step, true);
+			var max_year = Timeline.roundYear(Math.max.apply(null, years), major_step, true);
 			max_year += minor_step * (this.minorSections - 1);
 
 			return {
@@ -168,7 +250,7 @@ module JQueryTimeline {
 					$period.addClass("solid");
 					$("<div>", {
 						"class": "label",
-						"text": format_year(year),
+						"text": Timeline.formatYear(year),
 					}).appendTo($period);
 				}
 			}
@@ -185,33 +267,5 @@ module JQueryTimeline {
 			var scroll_before = this.$.scrollLeft();
 			this.$.scrollLeft(scroll_before + delta);
 		}
-	}
-
-	function round_year(year: number, step = 10, ceil = false): number {
-		var high = year / step;
-		high = ceil ? Math.ceil(high) : Math.floor(high);
-		if (high === 0) {
-			return 0; // avoid -0
-		}
-		return high * step;
-	}
-
-	function format_year(year: number): string {
-		var abs_year = Math.abs(year);
-		var label = "" + abs_year;
-		if (abs_year >= 1e9) {
-			abs_year /= 1e8;
-			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + "B";
-		} else if (abs_year >= 1e6) {
-			abs_year /= 1e5;
-			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + "M";
-		} else if (abs_year >= 1e4) {
-			abs_year /= 1e5;
-			abs_year = Math.round(abs_year) / 10;
-			label = abs_year + "K";
-		}
-		return label + (year < 0 ? " BC" : " AD");
 	}
 }
