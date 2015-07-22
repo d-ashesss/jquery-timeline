@@ -31,7 +31,7 @@ module JQueryTimeline {
 			if (options.length) {
 				options.end = options.start + options.length;
 			}
-			if (options.end) {
+			if (typeof options.end !== "undefined") {
 				this.length = options.end - options.start;
 				this.$.addClass("range");
 			} else {
