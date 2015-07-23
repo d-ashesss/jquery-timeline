@@ -157,6 +157,9 @@ module JQueryTimeline {
 
 			this.$.data("scroll", false);
 			this.$.mousedown((event: JQueryEventObject) => {
+				if (event.button !== 0) {
+					return;
+				}
 				var timeout = setTimeout(() => {
 					this.$.data("scroll", event.pageX)
 						.addClass("dragging");
