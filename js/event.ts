@@ -13,6 +13,8 @@ module JQueryTimeline {
 		private name: string;
 		private description: string;
 
+		private children: Array<Event> = [];
+
 		constructor(options: EventOptions) {
 			this.$ = $("<div>", {
 				"class": "event",
@@ -82,19 +84,45 @@ module JQueryTimeline {
 
 		tooltipContent(): string {
 			var $tooltip = $("<div>");
-			var $title = $("<div>", { "class": "title" }).appendTo($tooltip);
-			if (this.length > 0) {
-				var range = Timeline.formatRange(this.getStartYear(), this.getEndYear());
-				$("<strong>").text(range + ": ").appendTo($title);
-			} else {
-				var start = Timeline.formatYear(this.getStartYear());
-				$("<strong>").text(start + ": ").appendTo($title);
-			}
-			$title.append(this.name);
+			$("<div>", { "class": "title" })
+				.append(this.tooltipTitle())
+				.appendTo($tooltip);
 			if (this.description.length > 0) {
-				$("<div>", { "class": "content" }).html(this.description).appendTo($tooltip);
+				$("<div>", { "class": "content" })
+					.html(this.description)
+					.appendTo($tooltip);
 			}
 			return $tooltip.html();
+		}
+
+		tooltipTitle() {
+			var $title = $("<div>");
+			if (this.isSingle()) {
+				var start = Timeline.formatYear(this.getStartYear());
+				$("<strong>").text(start + ": ").appendTo($title);
+			} else {
+				var range = Timeline.formatRange(this.getStartYear(), this.getEndYear());
+				$("<strong>").text(range + ": ").appendTo($title);
+			}
+			$title.append(this.name);
+			this.children.forEach((event: Event) => {
+				$title = $title.after(event.tooltipTitle());
+			});
+			return $title;
+		}
+
+		isSingle(): boolean {
+			return typeof this.length === "undefined";
+		}
+
+		isMergable(): boolean {
+			return this.isSingle() && this.description.length === 0;
+		}
+
+		addChild(event: Event) {
+			this.children.push(event);
+			var total_events = this.children.length + 1;
+			this.$label.text("(" + total_events + " events)");
 		}
 	}
 }

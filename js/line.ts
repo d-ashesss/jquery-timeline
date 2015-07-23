@@ -7,6 +7,7 @@ module JQueryTimeline {
 		private color: string;
 
 		private events: Array<Event> = [];
+		private mergedEvents: { [s: number]: Event; } = {};
 
 		constructor(options: LineOptions = {}) {
 			this.$ = $("<div>", {
@@ -25,6 +26,15 @@ module JQueryTimeline {
 		addEvent(event_options: EventOptions): Event {
 			event_options.color = event_options.color || this.color;
 			var event = new Event(event_options);
+			if (event.isMergable()) {
+				var year = event.getStartYear();
+				if (typeof this.mergedEvents[year] !== "undefined") {
+					this.mergedEvents[year].addChild(event);
+					return event;
+				} else {
+					this.mergedEvents[year] = event;
+				}
+			}
 			var added = this.events.some((e: Event, i: number) => {
 				if (e.getStartYear() <= event.getStartYear()) {
 					return false;
