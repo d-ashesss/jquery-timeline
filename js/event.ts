@@ -47,16 +47,7 @@ module JQueryTimeline {
 			this.name = (options.name || options.label) || "";
 			this.description = options.description || "";
 
-			this.$.hover((event: JQueryMouseEventObject) => {
-				this.showTooltip(event);
-			}, () => {
-				this.hideTooltip();
-			}).mousemove((event: JQueryMouseEventObject) => {
-				this.showTooltip(event);
-			});
-			this.$.click((event: JQueryMouseEventObject) => {
-				this.showTooltip(event, true);
-			});
+			this.initTooltip();
 		}
 
 		getStartYear(): number {
@@ -81,6 +72,19 @@ module JQueryTimeline {
 			if (width > 0) {
 				this.$marker.width(width);
 			}
+		}
+
+		initTooltip() {
+			this.$.hover((event: JQueryMouseEventObject) => {
+				this.showTooltip(event);
+			}, () => {
+				this.hideTooltip();
+			}).mousemove((event: JQueryMouseEventObject) => {
+				this.showTooltip(event);
+			});
+			this.$.click((event: JQueryMouseEventObject) => {
+				this.showTooltip(event, true);
+			});
 		}
 
 		hideTooltip() {
