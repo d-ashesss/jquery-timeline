@@ -63,37 +63,6 @@ module JQueryTimeline {
 			return high * step;
 		}
 
-		static simplifyYear(year: number): string {
-			var abs_year = Math.abs(year);
-			var year_str = "" + abs_year;
-			if (abs_year >= 1e9) {
-				abs_year /= 1e8;
-				abs_year = Math.round(abs_year) / 10;
-				year_str = abs_year + "B";
-			} else if (abs_year >= 1e6) {
-				abs_year /= 1e5;
-				abs_year = Math.round(abs_year) / 10;
-				year_str = abs_year + "M";
-			} else if (abs_year >= 1e4) {
-				abs_year /= 1e5;
-				abs_year = Math.round(abs_year) / 10;
-				year_str = abs_year + "K";
-			}
-			return year_str;
-		}
-
-		static formatYear(year: number): string {
-			var label = this.simplifyYear(year);
-			return label + (year < 0 ? " BC" : " AD");
-		}
-
-		static formatRange(start: number, end: number): string {
-			if ((start < 0 && end < 0) || (start > 0 && end > 0)) {
-				return this.simplifyYear(start) + " - " + this.formatYear(end);
-			}
-			return this.formatYear(start) + " - " + this.formatYear(end);
-		}
-
 		$: JQuery;
 		private $background: JQuery;
 		private $content: JQuery;
@@ -253,7 +222,7 @@ module JQueryTimeline {
 					$period.addClass("solid");
 					$("<div>", {
 						"class": "label",
-						"text": Timeline.formatYear(year),
+						"text": (new EventDate(year)).formatYearEpoch(),
 					}).appendTo($period);
 				}
 			}

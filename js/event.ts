@@ -11,8 +11,6 @@ module JQueryTimeline {
 		private startDate: EventDate;
 		private endDate: EventDate;
 
-		private year: number;
-		private length: number;
 		private name: string;
 		private description: string;
 
@@ -113,13 +111,8 @@ module JQueryTimeline {
 
 		tooltipTitle() {
 			var $title = $("<div>");
-			if (this.isSingle()) {
-				var start = Timeline.formatYear(this.getStartYear());
-				$("<strong>").text(start + ": ").appendTo($title);
-			} else {
-				var range = Timeline.formatRange(this.getStartYear(), this.getEndYear());
-				$("<strong>").text(range + ": ").appendTo($title);
-			}
+			var date = this.startDate.render(this.endDate);
+			$("<strong>").text(date + ": ").appendTo($title);
 			$title.append(this.name);
 			this.children.forEach((event: Event) => {
 				$title = $title.after(event.tooltipTitle());
