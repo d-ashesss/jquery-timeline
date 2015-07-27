@@ -95,7 +95,7 @@ module JQueryTimeline {
 			Timeline.tooltip({
 				content: this.tooltipContent(),
 				x: event.clientX,
-				y: event.clientY + this.$.height() - event["layerY"],
+				y: event.clientY,
 				fixed: fixed
 			});
 		}

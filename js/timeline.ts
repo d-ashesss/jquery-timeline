@@ -45,7 +45,7 @@ module JQueryTimeline {
 					$tooltip.css("left", options.x - (width / 2));
 				}
 				if (typeof options.y !== "undefined") {
-					$tooltip.css("top", options.y);
+					$tooltip.css("top", options.y + 15);
 				}
 				if (options.fixed) {
 					$tooltip.addClass("fixed");
