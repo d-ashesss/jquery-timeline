@@ -2,6 +2,7 @@
 /// <reference path="timeline.ts" />
 /// <reference path="options.ts" />
 /// <reference path="event.ts" />
+/// <reference path="eventdate.ts" />
 /// <reference path="line.ts" />
 
 "use strict";

@@ -8,6 +8,9 @@ module JQueryTimeline {
 		private $marker: JQuery;
 		private $label: JQuery;
 
+		private startDate: EventDate;
+		private endDate: EventDate;
+
 		private year: number;
 		private length: number;
 		private name: string;
@@ -31,15 +34,17 @@ module JQueryTimeline {
 				text: options.label,
 			}).appendTo(this.$);
 
-			this.year = options.start;
+			this.startDate = new EventDate(options.start);
 			if (options.length) {
-				options.end = options.start + options.length;
+				this.endDate = new EventDate(options.start, options.length);
+			} else if (options.end) {
+				this.endDate = new EventDate(options.end);
 			}
-			if (typeof options.end !== "undefined") {
-				this.length = options.end - options.start;
-				this.$.addClass("range");
-			} else {
+
+			if (this.isSingle()) {
 				this.$.addClass("single");
+			} else {
+				this.$.addClass("range");
 			}
 			this.name = (options.name || options.label) || "";
 			this.description = options.description || "";
@@ -57,16 +62,27 @@ module JQueryTimeline {
 		}
 
 		getStartYear(): number {
-			return this.year;
+			return this.startDate.getYear();
 		}
 
 		getEndYear(): number {
-			return this.year + (this.length || 0);
+			if (!this.endDate) {
+				return this.getStartYear();
+			}
+			return this.endDate.getYear();
+		}
+
+		getLength(): number {
+			return this.getEndYear() - this.getStartYear();
 		}
 
 		render(options: RenderOptions) {
-			this.$.css("left", (this.year - options.min_year) * options.year_width);
-			this.$marker.width(this.length * options.year_width);
+			var offset = (this.getStartYear() - options.min_year) * options.year_width;
+			this.$.css("left", offset);
+			var width = this.getLength() * options.year_width;
+			if (width > 0) {
+				this.$marker.width(width);
+			}
 		}
 
 		hideTooltip() {
@@ -112,7 +128,7 @@ module JQueryTimeline {
 		}
 
 		isSingle(): boolean {
-			return typeof this.length === "undefined";
+			return this.getLength() === 0;
 		}
 
 		isMergable(): boolean {

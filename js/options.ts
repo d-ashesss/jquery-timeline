@@ -17,8 +17,8 @@ module JQueryTimeline {
 
 	export interface EventOptions {
 		label: string
-		start: number
-		end?: number
+		start: string
+		end?: string
 		length?: number
 		color?: string
 		name?: string
