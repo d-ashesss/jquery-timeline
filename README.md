@@ -1,6 +1,12 @@
 # History Timeline jQuery Plugin
 
-## Install via bower
+## Install
+**npm**
+```bash
+npm install jquery-timeline
+```
+
+**bower**
 ```bash
 bower install jquery-timeline
 ```
