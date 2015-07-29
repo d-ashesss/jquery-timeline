@@ -27,6 +27,9 @@ module JQueryTimeline {
 					"background-color": options.color || Event.defaultColor,
 				},
 			}).appendTo(this.$);
+			if (options.color === "transparent") {
+				this.$marker.addClass("border");
+			}
 			this.$label = $("<div>", {
 				"class": "label",
 				text: options.label,
