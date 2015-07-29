@@ -15,6 +15,9 @@
 		"dist/timeline.css"
 	],
 	"ignore": [
-		"tsd.json"
+		"tsd.json",
+		"package.json",
+		"gulp",
+		"gulpfile.js"
 	]
 }
