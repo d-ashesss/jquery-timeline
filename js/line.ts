@@ -36,7 +36,10 @@ module JQueryTimeline {
 				}
 			}
 			var added = this.events.some((e: Event, i: number) => {
-				if (e.getStartYear() <= event.getStartYear()) {
+				if (e.getStartYear() < event.getStartYear()) {
+					return false;
+				}
+				if (e.getStartYear() === event.getStartYear() && (event.isSingle() || !e.isSingle())) {
 					return false;
 				}
 				this.events.splice(i, 0, event);
