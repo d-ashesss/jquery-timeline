@@ -101,10 +101,8 @@ module JQueryTimeline {
 		}
 
 		tooltipContent(): string {
-			var $tooltip = $("<div>");
-			$("<div>", { "class": "title" })
-				.append(this.tooltipTitle())
-				.appendTo($tooltip);
+			var $tooltip = $("<div>")
+				.append(this.tooltipTitle());
 			if (this.description.length > 0) {
 				$("<div>", { "class": "content" })
 					.html(this.description)
@@ -113,14 +111,27 @@ module JQueryTimeline {
 			return $tooltip.html();
 		}
 
-		tooltipTitle() {
+		tooltipTitle(): JQuery {
+			var titles = [this].concat(this.children).reduce<JQuery[]>(function(titles: JQuery[], event: Event) {
+				var $title = event.renderTooltipTitle();
+				var index = event.getDateIndex();
+				if (typeof titles[index] === "undefined") {
+					titles[index] = $title;
+				} else {
+					titles[index] = titles[index].after($title);
+				}
+				return titles;
+			}, []);
+			return titles.reduce(function($title, $title_group, i) {
+				return $title.append($title_group);
+			}, $("<div>", { "class": "title" }));
+		}
+
+		renderTooltipTitle(): JQuery {
 			var $title = $("<div>");
 			var date = this.startDate.render(this.endDate);
 			$("<strong>").text(date + ": ").appendTo($title);
 			$title.append(this.name);
-			this.children.forEach((event: Event) => {
-				$title = $title.after(event.tooltipTitle());
-			});
 			return $title;
 		}
 
@@ -136,6 +147,10 @@ module JQueryTimeline {
 			this.children.push(event);
 			var total_events = this.children.length + 1;
 			this.$label.text("(" + total_events + " events)");
+		}
+
+		getDateIndex(): number {
+			return this.startDate.getDateIndex();
 		}
 	}
 }

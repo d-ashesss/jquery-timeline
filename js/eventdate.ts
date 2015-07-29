@@ -71,17 +71,23 @@ module JQueryTimeline {
 			if (/^\d+$/.exec(date)) {
 				this.year = parseInt(date);
 			} else if (match = /^(\d+)-(\d+)$/.exec(date)) {
-				this.month = parseInt(match[1]) - 1;
+				this.month = parseInt(match[1]);
 				this.year = parseInt(match[2]);
 			} else if (match = /^(\d+)-(\d+)-(\d+)$/.exec(date)) {
 				this.date = parseInt(match[1]);
-				this.month = parseInt(match[2]) - 1;
+				this.month = parseInt(match[2]);
 				this.year = parseInt(match[3]);
 			}
 			if (negative) {
 				this.year *= -1;
 			}
 			this.year += length || 0;
+		}
+
+		getDateIndex(): number {
+			var date = "0" + (this.date || "0");
+			var month = "0" + (this.month || "0");
+			return parseInt(month.substr(-2) + date.substr(-2));
 		}
 
 		getDate(): number {
@@ -93,7 +99,10 @@ module JQueryTimeline {
 		}
 
 		getMonthName(): string {
-			return EventDate.monthNames[this.month];
+			if (typeof this.month === "undefined") {
+				return "";
+			}
+			return EventDate.monthNames[this.month - 1];
 		}
 
 		getYear(): number {
