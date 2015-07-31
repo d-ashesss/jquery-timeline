@@ -132,12 +132,14 @@ var JQueryTimeline;
             return line;
         };
         Timeline.prototype._addLine = function (line_options) {
+            line_options = JQueryTimeline.$.extend(true, {}, line_options);
             var line = new JQueryTimeline.Line(line_options);
             this.$content.append(line.$);
             this.lines.push(line);
             return line;
         };
         Timeline.prototype.addEvent = function (event_options, line_index) {
+            event_options = JQueryTimeline.$.extend(true, {}, event_options);
             if (typeof line_index === "undefined") {
                 if (this.lines.length === 0) {
                     this._addLine();
