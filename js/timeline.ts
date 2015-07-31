@@ -156,6 +156,7 @@ module JQueryTimeline {
 		}
 
 		private _addLine(line_options?: LineOptions): Line {
+			line_options = $.extend(true, {}, line_options);
 			var line = new Line(line_options);
 			this.$content.append(line.$);
 			this.lines.push(line);
@@ -163,6 +164,7 @@ module JQueryTimeline {
 		}
 
 		addEvent(event_options: EventOptions, line_index?: number): Event {
+			event_options = $.extend(true, {}, event_options);
 			if (typeof line_index === "undefined") {
 				if (this.lines.length === 0) {
 					this._addLine();
