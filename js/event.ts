@@ -13,6 +13,7 @@ module JQueryTimeline {
 
 		private name: string;
 		private description: string;
+		private tooltip: string;
 
 		private children: Array<Event> = [];
 
@@ -95,8 +96,11 @@ module JQueryTimeline {
 		}
 
 		showTooltip(event: JQueryMouseEventObject, fixed = false) {
+			if (!this.tooltip) {
+				this.tooltip = this.tooltipContent();
+			}
 			Tooltip.show({
-				content: this.tooltipContent(),
+				content: this.tooltip,
 				x: event.clientX,
 				y: event.clientY,
 				fixed: fixed
