@@ -122,6 +122,19 @@ module JQueryTimeline {
 		}
 
 		addEvent(event_options: EventOptions, line_index?: number): Event {
+			var event = this._addEvent(event_options, line_index);
+			this.render();
+			return event;
+		}
+
+		addEvents(event_options: EventOptions[], line_index?: number) {
+			event_options.forEach(function(event_options: EventOptions) {
+				this._addEvent(event_options, line_index);
+			}, this);
+			this.render();
+		}
+
+		private _addEvent(event_options: EventOptions, line_index?: number): Event {
 			event_options = $.extend(true, {}, event_options);
 			if (typeof line_index === "undefined") {
 				if (this.lines.length === 0) {
@@ -132,9 +145,7 @@ module JQueryTimeline {
 			if (typeof this.lines[line_index] === "undefined") {
 				return;
 			}
-			var event = this.lines[line_index].addEvent(event_options);
-			this.render();
-			return event;
+			return this.lines[line_index].addEvent(event_options);
 		}
 
 		render() {
