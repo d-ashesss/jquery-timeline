@@ -91,11 +91,11 @@ module JQueryTimeline {
 		}
 
 		hideTooltip() {
-			Timeline.tooltip({ hide: true });
+			Tooltip.hide();
 		}
 
 		showTooltip(event: JQueryMouseEventObject, fixed = false) {
-			Timeline.tooltip({
+			Tooltip.show({
 				content: this.tooltipContent(),
 				x: event.clientX,
 				y: event.clientY,

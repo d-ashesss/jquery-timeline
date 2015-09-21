@@ -4,6 +4,7 @@
 /// <reference path="event.ts" />
 /// <reference path="eventdate.ts" />
 /// <reference path="line.ts" />
+/// <reference path="tooltip.ts" />
 
 "use strict";
 

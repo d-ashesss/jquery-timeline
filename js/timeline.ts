@@ -12,48 +12,6 @@ module JQueryTimeline {
 			minorSections: 5,
 		};
 
-		static $tooltip: JQuery;
-
-		static tooltip(options: TooltipOptions): JQuery {
-			var $tooltip = Timeline.$tooltip;
-			if (!$tooltip) {
-				$tooltip = Timeline.$tooltip = $("<div>", {
-					"class": "jquery-timeline-tooltip"
-				}).appendTo("body");
-				$("body").click((e) => {
-					if ($(e.target).is(".event")
-							//|| $(e.target).parent().is(".event")
-						|| $(e.target).is(".jquery-timeline-tooltip")
-						|| $(e.target).parents(".event, .jquery-timeline-tooltip").length > 0) {
-						return;
-					}
-					this.tooltip({ hide: true, fixed: true });
-				});
-			}
-			if (options.hide) {
-				if ($tooltip.is(".fixed") && !options.fixed) {
-					return;
-				}
-				return $tooltip.removeClass("fixed").hide();
-			}
-			if (!$tooltip.is(".fixed") || options.fixed) {
-				if (typeof options.content !== "undefined") {
-					$tooltip.html(options.content);
-				}
-				if (typeof options.x !== "undefined") {
-					var width = $tooltip.width();
-					$tooltip.css("left", options.x - (width / 2));
-				}
-				if (typeof options.y !== "undefined") {
-					$tooltip.css("top", options.y + 15);
-				}
-				if (options.fixed) {
-					$tooltip.addClass("fixed");
-				}
-			}
-			return $tooltip.show();
-		}
-
 		static roundYear(year: number, step = 10, ceil = false): number {
 			var high = year / step;
 			high = ceil ? Math.ceil(high) : Math.floor(high);

@@ -39,6 +39,5 @@ module JQueryTimeline {
 		x?: number
 		y?: number
 		fixed?: boolean
-		hide?: boolean
 	}
 }
