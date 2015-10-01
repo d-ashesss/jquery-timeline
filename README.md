@@ -88,6 +88,7 @@ Only one of **length** or **end** options required. If both provided **length** 
 - `addLine(LineOptions)`: JQuery
 - `addEvent(EventOptions)`: JQuery — adds event to the last line
 - `addEvent(EventOptions, line: number)`: JQuery — adds event to the line with index `line`
+- `scrollTo(year: number)` — scrolls timeline to specifie year
 
 ## License
 Released under the [MIT license](http://www.opensource.org/licenses/MIT).

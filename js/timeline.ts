@@ -197,7 +197,7 @@ module JQueryTimeline {
 					}).appendTo($period);
 				}
 			}
-			this.$.scrollLeft(options.major_step * options.year_width);
+			this.scrollTo(options.min_year + options.major_step);
 		}
 
 		private renderLines(options: RenderOptions) {
@@ -209,6 +209,12 @@ module JQueryTimeline {
 		private scroll(delta: number) {
 			var scroll_before = this.$.scrollLeft();
 			this.$.scrollLeft(scroll_before + delta);
+		}
+
+		scrollTo(year: number) {
+			var options = this.getRenderOptions();
+			var offset = year - options.min_year;
+			this.$.scrollLeft(offset * options.year_width);
 		}
 	}
 }
