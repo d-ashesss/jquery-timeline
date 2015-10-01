@@ -1,4 +1,4 @@
-/* jquery-timeline v0.2.0 | (c) 2015 Sergey Mashentsev <d.ashesss@gmail.com> | MIT License */
+/* jquery-timeline v0.3.0 | (c) 2015 Sergey Mashentsev <d.ashesss@gmail.com> | MIT License */
 "use strict";
 var JQueryTimeline;
 (function (JQueryTimeline) {
@@ -42,45 +42,6 @@ var JQueryTimeline;
             options.lines.forEach(this._addLine, this);
             this.render();
         }
-        Timeline.tooltip = function (options) {
-            var _this = this;
-            var $tooltip = Timeline.$tooltip;
-            if (!$tooltip) {
-                $tooltip = Timeline.$tooltip = JQueryTimeline.$("<div>", {
-                    "class": "jquery-timeline-tooltip"
-                }).appendTo("body");
-                JQueryTimeline.$("body").click(function (e) {
-                    if (JQueryTimeline.$(e.target).is(".event")
-                        || JQueryTimeline.$(e.target).is(".jquery-timeline-tooltip")
-                        || JQueryTimeline.$(e.target).parents(".event, .jquery-timeline-tooltip").length > 0) {
-                        return;
-                    }
-                    _this.tooltip({ hide: true, fixed: true });
-                });
-            }
-            if (options.hide) {
-                if ($tooltip.is(".fixed") && !options.fixed) {
-                    return;
-                }
-                return $tooltip.removeClass("fixed").hide();
-            }
-            if (!$tooltip.is(".fixed") || options.fixed) {
-                if (typeof options.content !== "undefined") {
-                    $tooltip.html(options.content);
-                }
-                if (typeof options.x !== "undefined") {
-                    var width = $tooltip.width();
-                    $tooltip.css("left", options.x - (width / 2));
-                }
-                if (typeof options.y !== "undefined") {
-                    $tooltip.css("top", options.y + 15);
-                }
-                if (options.fixed) {
-                    $tooltip.addClass("fixed");
-                }
-            }
-            return $tooltip.show();
-        };
         Timeline.roundYear = function (year, step, ceil) {
             if (step === void 0) { step = 10; }
             if (ceil === void 0) { ceil = false; }
@@ -139,6 +100,17 @@ var JQueryTimeline;
             return line;
         };
         Timeline.prototype.addEvent = function (event_options, line_index) {
+            var event = this._addEvent(event_options, line_index);
+            this.render();
+            return event;
+        };
+        Timeline.prototype.addEvents = function (event_options, line_index) {
+            event_options.forEach(function (event_options) {
+                this._addEvent(event_options, line_index);
+            }, this);
+            this.render();
+        };
+        Timeline.prototype._addEvent = function (event_options, line_index) {
             event_options = JQueryTimeline.$.extend(true, {}, event_options);
             if (typeof line_index === "undefined") {
                 if (this.lines.length === 0) {
@@ -149,9 +121,7 @@ var JQueryTimeline;
             if (typeof this.lines[line_index] === "undefined") {
                 return;
             }
-            var event = this.lines[line_index].addEvent(event_options);
-            this.render();
-            return event;
+            return this.lines[line_index].addEvent(event_options);
         };
         Timeline.prototype.render = function () {
             this.$background.empty();
@@ -197,7 +167,7 @@ var JQueryTimeline;
                     }).appendTo($period);
                 }
             }
-            this.$.scrollLeft(options.major_step * options.year_width);
+            this.scrollTo(options.min_year + options.major_step);
         };
         Timeline.prototype.renderLines = function (options) {
             this.lines.forEach(function (line) {
@@ -207,6 +177,11 @@ var JQueryTimeline;
         Timeline.prototype.scroll = function (delta) {
             var scroll_before = this.$.scrollLeft();
             this.$.scrollLeft(scroll_before + delta);
+        };
+        Timeline.prototype.scrollTo = function (year) {
+            var options = this.getRenderOptions();
+            var offset = year - options.min_year;
+            this.$.scrollLeft(offset * options.year_width);
         };
         Timeline.zoomBase = 1000;
         Timeline.yearScale = 0.24;
@@ -294,12 +269,15 @@ var JQueryTimeline;
             });
         };
         Event.prototype.hideTooltip = function () {
-            JQueryTimeline.Timeline.tooltip({ hide: true });
+            JQueryTimeline.Tooltip.hide();
         };
         Event.prototype.showTooltip = function (event, fixed) {
             if (fixed === void 0) { fixed = false; }
-            JQueryTimeline.Timeline.tooltip({
-                content: this.tooltipContent(),
+            if (!this.tooltip) {
+                this.tooltip = this.tooltipContent();
+            }
+            JQueryTimeline.Tooltip.show({
+                content: this.tooltip,
                 x: event.clientX,
                 y: event.clientY,
                 fixed: fixed
@@ -568,12 +546,63 @@ var JQueryTimeline;
     })();
     JQueryTimeline.Line = Line;
 })(JQueryTimeline || (JQueryTimeline = {}));
+"use strict";
+var JQueryTimeline;
+(function (JQueryTimeline) {
+    var Tooltip = (function () {
+        function Tooltip() {
+        }
+        Tooltip.init = function () {
+            Tooltip.$ = JQueryTimeline.$("<div>", {
+                "class": "jquery-timeline-tooltip"
+            }).appendTo("body");
+            JQueryTimeline.$("body").click(function (e) {
+                if (JQueryTimeline.$(e.target).is(".event")
+                    || JQueryTimeline.$(e.target).is(".jquery-timeline-tooltip")
+                    || JQueryTimeline.$(e.target).parents(".event, .jquery-timeline-tooltip").length > 0) {
+                    return;
+                }
+                Tooltip.hide(true);
+            });
+            return Tooltip.$;
+        };
+        Tooltip.show = function (options) {
+            var $tooltip = Tooltip.$ || Tooltip.init();
+            if (!$tooltip.is(".fixed") || options.fixed) {
+                if (typeof options.content !== "undefined") {
+                    $tooltip.html(options.content);
+                }
+                if (typeof options.x !== "undefined") {
+                    var width = $tooltip.width();
+                    $tooltip.css("left", options.x - (width / 2));
+                }
+                if (typeof options.y !== "undefined") {
+                    $tooltip.css("top", options.y + 15);
+                }
+                if (options.fixed) {
+                    $tooltip.addClass("fixed");
+                }
+            }
+            return $tooltip.show();
+        };
+        Tooltip.hide = function (force) {
+            if (force === void 0) { force = false; }
+            if (Tooltip.$.is(".fixed") && !force) {
+                return;
+            }
+            return Tooltip.$.removeClass("fixed").hide();
+        };
+        return Tooltip;
+    })();
+    JQueryTimeline.Tooltip = Tooltip;
+})(JQueryTimeline || (JQueryTimeline = {}));
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="timeline.ts" />
 /// <reference path="options.ts" />
 /// <reference path="event.ts" />
 /// <reference path="eventdate.ts" />
 /// <reference path="line.ts" />
+/// <reference path="tooltip.ts" />
 "use strict";
 (function ($) {
     JQueryTimeline.$ = $;

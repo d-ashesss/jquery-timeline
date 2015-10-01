@@ -5,8 +5,6 @@ declare module JQueryTimeline {
         static zoomBase: number;
         static yearScale: number;
         static defaultOptions: Options;
-        static $tooltip: JQuery;
-        static tooltip(options: TooltipOptions): JQuery;
         static roundYear(year: number, step?: number, ceil?: boolean): number;
         $: JQuery;
         private $background;
@@ -20,11 +18,14 @@ declare module JQueryTimeline {
         addLine(line_options?: LineOptions): Line;
         private _addLine(line_options?);
         addEvent(event_options: EventOptions, line_index?: number): Event;
+        addEvents(event_options: EventOptions[], line_index?: number): void;
+        private _addEvent(event_options, line_index?);
         render(): void;
         private getRenderOptions();
         private renderBackground(options);
         private renderLines(options);
         private scroll(delta);
+        scrollTo(year: number): void;
     }
 }
 declare module JQueryTimeline {
@@ -62,7 +63,6 @@ declare module JQueryTimeline {
         x?: number;
         y?: number;
         fixed?: boolean;
-        hide?: boolean;
     }
 }
 declare module JQueryTimeline {
@@ -75,6 +75,7 @@ declare module JQueryTimeline {
         private endDate;
         private name;
         private description;
+        private tooltip;
         private children;
         constructor(options: EventOptions);
         getStartYear(): number;
@@ -127,6 +128,14 @@ declare module JQueryTimeline {
         addEvent(event_options: EventOptions): Event;
         getYears(): Array<number>;
         render(options: RenderOptions): void;
+    }
+}
+declare module JQueryTimeline {
+    class Tooltip {
+        static $: JQuery;
+        static init(): JQuery;
+        static show(options: TooltipOptions): JQuery;
+        static hide(force?: boolean): JQuery;
     }
 }
 interface JQuery {
