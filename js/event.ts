@@ -123,10 +123,9 @@ module JQueryTimeline {
 				var $title = event.renderTooltipTitle();
 				var index = event.getDateIndex();
 				if (typeof titles[index] === "undefined") {
-					titles[index] = $title;
-				} else {
-					titles[index] = titles[index].after($title);
+					titles[index] = $("<div>");
 				}
+				titles[index].append($title);
 				return titles;
 			}, []);
 			return titles.reduce(function($title, $title_group, i) {
