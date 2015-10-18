@@ -1,4 +1,4 @@
-/* jquery-timeline v0.3.0 | (c) 2015 Sergey Mashentsev <d.ashesss@gmail.com> | MIT License */
+/* jquery-timeline v0.3.1 | (c) 2015 Sergey Mashentsev <d.ashesss@gmail.com> | MIT License */
 "use strict";
 var JQueryTimeline;
 (function (JQueryTimeline) {
@@ -270,6 +270,7 @@ var JQueryTimeline;
         };
         Event.prototype.hideTooltip = function () {
             JQueryTimeline.Tooltip.hide();
+            this.tooltip = null;
         };
         Event.prototype.showTooltip = function (event, fixed) {
             if (fixed === void 0) { fixed = false; }
@@ -298,11 +299,9 @@ var JQueryTimeline;
                 var $title = event.renderTooltipTitle();
                 var index = event.getDateIndex();
                 if (typeof titles[index] === "undefined") {
-                    titles[index] = $title;
+                    titles[index] = JQueryTimeline.$("<div>");
                 }
-                else {
-                    titles[index] = titles[index].after($title);
-                }
+                titles[index].append($title);
                 return titles;
             }, []);
             return titles.reduce(function ($title, $title_group, i) {

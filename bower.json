@@ -6,7 +6,7 @@
 	"authors": [
 		{ "name": "Sergey Mashentsev", "email": "d.ashesss@gmail.com" }
 	],
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"dependencies": {
 		"jquery": ">=1.4"
 	},
